@@ -1,0 +1,69 @@
+# Intake cell: registered data sources, the intake queue (what to land in the lake, its lease and result)
+# and the event trail of every intake.
+cell: intake
+title: Intake
+port: 3624
+resources:
+  source:
+    table: sources
+    plural: sources
+    legacy_table: source_registry
+    filters: [source_key, status, domain, dataset, source_kind]
+    fields:
+      source_key: {type: text, required: true, max_length: 64, unique: true}
+      display_name: {type: text, required: true, max_length: 160}
+      source_kind: {type: enum, required: true, values: [manual, file, api, webhook, email, calendar, database, application, other]}
+      provider: {type: text, max_length: 200}
+      domain: {type: text, required: true, max_length: 80}
+      dataset: {type: text, required: true, max_length: 120}
+      owner_scope: {type: enum, values: [personal, solo_empire, venture, client, shared], default: solo_empire}
+      privacy_class: {type: enum, values: [public, internal, private, restricted], default: private}
+      retention_class: {type: text, default: operational, max_length: 64}
+      ingest_mode: {type: enum, values: [manual, batch, stream, webhook], default: manual}
+      status: {type: enum, values: [planned, active, paused, retired], default: planned}
+      description: {type: text}
+      last_ingested_at: {type: timestamp}
+  intake:
+    table: intakes
+    plural: intakes
+    legacy_table: intake_queue
+    filters: [status, domain, dataset, source_id, intake_key, idempotency_key, lease_owner]
+    fields:
+      intake_key: {type: text, required: true, max_length: 96, unique: true}
+      source_id: {type: ref, to: source, required: true}
+      domain: {type: text, required: true, max_length: 80}
+      dataset: {type: text, required: true, max_length: 120}
+      schema_version: {type: text, default: "1", max_length: 32}
+      payload_kind: {type: enum, required: true, values: [json, jsonl, csv, binary, markdown, parquet, other]}
+      input_ref: {type: text, required: true, max_length: 240}
+      source_batch_ref: {type: text, max_length: 160}
+      idempotency_key: {type: text, required: true, max_length: 160, unique: true}
+      privacy_class: {type: enum, values: [public, internal, private, restricted], default: private}
+      retention_class: {type: text, default: operational, max_length: 64}
+      requested_by: {type: enum, values: [human, agent, automation], default: human}
+      status: {type: enum, values: [queued, processing, landed, verified, rejected, failed, cancelled], default: queued}
+      requested_at: {type: timestamp}
+      claimed_at: {type: timestamp}
+      lease_owner: {type: text, max_length: 200}
+      lease_expires_at: {type: timestamp}
+      attempt_count: {type: int, default: 0, min: 0}
+      record_count: {type: int, min: 0}
+      raw_sha256: {type: text, max_length: 64}
+      lake_run_id: {type: text, max_length: 200}
+      lake_manifest_key: {type: text, max_length: 512}
+      lake_raw_object_key: {type: text, max_length: 512}
+      lake_bronze_object_key: {type: text, max_length: 512}
+      error_code: {type: text, max_length: 80}
+      error_message: {type: text, max_length: 500}
+      verified_at: {type: timestamp}
+  intake-event:
+    table: intake_events
+    plural: intake-events
+    filters: [intake_id, event_type]
+    fields:
+      intake_id: {type: ref, to: intake, required: true}
+      event_type: {type: enum, required: true, values: [queued, claimed, lease_renewed, landed, verified, rejected, failed, retried, cancelled]}
+      actor: {type: text, default: system, max_length: 80}
+      from_status: {type: text, max_length: 32}
+      to_status: {type: text, required: true, max_length: 32}
+      reason: {type: text, max_length: 500}
