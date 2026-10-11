@@ -1,0 +1,8 @@
+system_id: bookchaowalit/private/solo-intake
+prefix: CARD
+brand: "SOLO INTAKE"
+subtitle: "Cell ของ source, intake และ intake event (ฝั่งรับข้อมูลเข้า)"
+footer: "solo-intake — Product Card"
+color: "#457b9d"
+audience: internal
+tier: L0
