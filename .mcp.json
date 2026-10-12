@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "intake": {
+      "command": ".venv/bin/intake-mcp",
+      "args": []
+    }
+  }
+}
