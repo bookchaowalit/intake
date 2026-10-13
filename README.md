@@ -1,5 +1,4 @@
-# intake
-
+# platform-intake-api
 The Intake cell: its own API (Railway, serverless) and its own Neon
 database, described by `cell.yaml` and served by the code in `src/cellkit/`, which
 this repository owns. It
@@ -8,8 +7,8 @@ HTTP with the caller's token.
 
 | | |
 |---|---|
-| API | Railway project `intake`, service `intake-api` (Serverless) |
-| Data | Neon project `intake`, database `intake` |
+| API | Railway project `platform-intake-api`, service `intake-api` (Serverless) |
+| Data | Neon project `platform-intake-api`, database `intake` |
 | Registry | solo-empire `repository-catalog/registries/online-systems.yaml` (`intake`) |
 
 ## API
