@@ -649,9 +649,9 @@ def create_app(
 
         @app.post(f"/v1/{r.plural}", status_code=201, name=f"create_{r.name}")
         def create(
-            body: create_body,
+            body: create_body,  # type: ignore[valid-type]
             caller: Caller,
-            background: BackgroundTasks,  # type: ignore[valid-type]
+            background: BackgroundTasks,
             idempotency_key: Annotated[str | None, Header()] = None,
         ):
             data = {
@@ -732,8 +732,8 @@ def create_app(
         @app.patch(f"/v1/{r.plural}/{{record_id}}", name=f"update_{r.name}")
         def update(
             record_id: int,
-            body: update_body,
-            caller: Caller,  # type: ignore[valid-type]
+            body: update_body,  # type: ignore[valid-type]
+            caller: Caller,
             background: BackgroundTasks,
         ):
             requested = values(r, body, body.model_fields_set - {"expected_version"})
