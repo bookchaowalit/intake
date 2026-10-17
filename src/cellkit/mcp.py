@@ -44,9 +44,11 @@ from mcp.server.mcpserver.exceptions import ToolError
 from pydantic import (
     BaseModel,
     ConfigDict,
-    Field as PydanticField,
     ValidationError,
     create_model,
+)
+from pydantic import (
+    Field as PydanticField,
 )
 
 from cellkit.app import _constraints, _python_type
@@ -88,7 +90,8 @@ STATUS_WORDS = {
 
 # The arguments exactly as the caller sent them: the framework fills defaults, but "unset" and "null" differ.
 sent: contextvars.ContextVar[dict[str, Any]] = contextvars.ContextVar(
-    "sent", default={}
+    "sent",
+    default={},  # noqa: B039 - read-only: every call sets a fresh dict and nothing mutates the default
 )
 
 
@@ -434,7 +437,7 @@ def build_server(
             ),
             "create": (
                 f"Create a {what}. Pass the same idempotency_key when retrying so a retry cannot duplicate.",
-                lambda a, base=base, own=any(f.name == "idempotency_key" for f in r.fields): (
+                lambda a, base=base, own=any(f.name == "idempotency_key" for f in r.fields): (  # noqa: B008 - binds the per-resource value at definition time, on purpose
                     call(
                         "POST",
                         base,
